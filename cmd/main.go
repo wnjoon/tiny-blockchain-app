@@ -10,7 +10,8 @@ import (
 
 func main() {
 	conf := config.Config{
-		Endpoint: "ws://127.0.0.1:32001",
+		// Endpoint: "ws://127.0.0.1:32001",
+		Endpoint: "http://127.0.0.1:22001",
 	}
 	client, err := client.NewClient(conf)
 	if err != nil {
