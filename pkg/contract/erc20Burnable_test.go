@@ -1,6 +1,8 @@
 package contract
 
 import (
+	"context"
+	"math/big"
 	"strconv"
 	"testing"
 	"tiny-blockchain-app/config"
@@ -31,7 +33,7 @@ func TestTransferERC20Burnable(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, common.HexToAddress(expectedAddress2), keyPair2.PublicKey)
 
-	contractAddress := "0xC41d1D11c38baBb1385d9d908cea0C3944ba0B66"
+	contractAddress := "0x5B0CFA20e02145ea529983c7954702Ab5E9e7949"
 
 	// prevBalance1, err := BalanceERC20Burnable(client, contractAddress, keyPair1.PublicKey.Hex())
 	// assert.Equal(t, nil, err)
@@ -63,37 +65,39 @@ func TestTransferERC20Burnable(t *testing.T) {
 
 }
 
-// func TestDeployERC20Burnable(t *testing.T) {
-// 	conf := config.Config{
-// 		Endpoint: "http://127.0.0.1:22001",
-// 	}
-// 	client, _ := client.NewClient(conf)
+func TestDeployERC20Burnable(t *testing.T) {
+	conf := config.Config{
+		Endpoint: "http://127.0.0.1:22001",
+	}
+	client, _ := client.NewClient(conf)
 
-// 	samplePrivateKey := "a94b325ab4bea563fb94bffcf855fffb0bbac1a8e481d80f6816c6215c48bde4"
-// 	keyPair, _ := wallet.GetKeyPairFromPrivateKey(samplePrivateKey)
+	samplePrivateKey := "a94b325ab4bea563fb94bffcf855fffb0bbac1a8e481d80f6816c6215c48bde4"
+	keyPair, _ := wallet.GetKeyPairFromPrivateKey(samplePrivateKey)
 
-// 	constructor := ERC20Constructor{
-// 		Name:     "ERC20Burnable",
-// 		Symbol:   "E2B",
-// 		Decimals: 10,
-// 	}
+	constructor := ERC20Constructor{
+		Name:     "ERC20Burnable",
+		Symbol:   "E2B",
+		Decimals: 10,
+	}
 
-// 	// 다음에 사용할 논스값
-// 	nonce, err := client.PendingNonceAt(context.Background(), keyPair.PublicKey)
-// 	assert.Equal(t, nil, err)
+	// 다음에 사용할 논스값
+	nonce, err := client.PendingNonceAt(context.Background(), keyPair.PublicKey)
+	assert.Equal(t, nil, err)
 
-// 	// 컨트랙트 배포
-// 	response, err := DeployERC20Burnable(client, *keyPair, constructor)
-// 	assert.Equal(t, nil, err)
+	// 컨트랙트 배포
+	response, err := DeployERC20Burnable(client, *keyPair, constructor)
+	assert.Equal(t, nil, err)
 
-// 	// 다음에 사용할 논스값을 배포 과정에 정확히 사용하였는가?
-// 	assert.Equal(t, nonce, response.Tx.Nonce())
+	// 다음에 사용할 논스값을 배포 과정에 정확히 사용하였는가?
+	assert.Equal(t, nonce, response.Tx.Nonce())
 
-// 	// Transaction이 정상적으로 만들어졌는지?
-// 	receipt, err := client.TransactionReceipt(context.Background(), response.Tx.Hash())
-// 	assert.Equal(t, uint64(1), receipt.Status)
-// 	assert.Equal(t, nil, err)
-// }
+	// Transaction이 정상적으로 만들어졌는지?
+	receipt, err := client.TransactionReceipt(context.Background(), response.Tx.Hash())
+	assert.Equal(t, uint64(1), receipt.Status)
+	assert.Equal(t, nil, err)
+
+	t.Log(receipt.ContractAddress)
+}
 
 func TestMintERC20Burnable(t *testing.T) {
 	conf := config.Config{
@@ -104,12 +108,12 @@ func TestMintERC20Burnable(t *testing.T) {
 	samplePrivateKey := "a94b325ab4bea563fb94bffcf855fffb0bbac1a8e481d80f6816c6215c48bde4"
 	keyPair, _ := wallet.GetKeyPairFromPrivateKey(samplePrivateKey)
 
-	contractAddress := "0xC41d1D11c38baBb1385d9d908cea0C3944ba0B66"
+	contractAddress := "0x5B0CFA20e02145ea529983c7954702Ab5E9e7949"
 
 	prevBalance, err := BalanceERC20Burnable(client, contractAddress, keyPair.PublicKey.Hex())
 	assert.Equal(t, nil, err)
 
-	amount := 10000
+	amount := 1000000
 	receipt, err := MintERC20Burnable(client, *keyPair, contractAddress, keyPair.PublicKey.Hex(), amount)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, uint64(1), receipt.Status)
@@ -133,14 +137,14 @@ func TestTransferERC20BurnableUsingABIGen(t *testing.T) {
 	toPrivateKey := "432024aaf30b6921f51f9c21ffad5485fa82550c7627fb2eb121ebe3f165648a"
 	toKeyPair, _ := wallet.GetKeyPairFromPrivateKey(toPrivateKey)
 
-	contractAddress := "0xC41d1D11c38baBb1385d9d908cea0C3944ba0B66"
+	contractAddress := "0x5B0CFA20e02145ea529983c7954702Ab5E9e7949"
 
 	fromPrevBalance, _ := BalanceERC20Burnable(client, contractAddress, fromKeyPair.PublicKey.Hex())
 	toPrevBalance, _ := BalanceERC20Burnable(client, contractAddress, toKeyPair.PublicKey.Hex())
 	fromPrevBalanceInt, _ := strconv.Atoi(fromPrevBalance) // from prev balance of Int
 	toPrevBalanceInt, _ := strconv.Atoi(toPrevBalance)     // to prev balance of Int
 
-	amount := 13
+	amount := 40
 	receipt, err := TransferERC20UsingABIGen(client, *fromKeyPair, contractAddress, toKeyPair.PublicKey.Hex(), amount)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, uint64(1), receipt.Status)
@@ -154,4 +158,26 @@ func TestTransferERC20BurnableUsingABIGen(t *testing.T) {
 	assert.Equal(t, fromPrevBalanceInt-amount, fromCurrBalanceInt)
 	assert.Equal(t, toPrevBalanceInt+amount, toCurrBalanceInt)
 
+}
+
+func TestApproveERC20BurnableUsingABIGen(t *testing.T) {
+	conf := config.Config{
+		Endpoint: "http://127.0.0.1:22001",
+	}
+	client, _ := client.NewClient(conf)
+
+	fromPrivateKey := "a94b325ab4bea563fb94bffcf855fffb0bbac1a8e481d80f6816c6215c48bde4"
+	fromKeyPair, _ := wallet.GetKeyPairFromPrivateKey(fromPrivateKey)
+
+	toPrivateKey := "432024aaf30b6921f51f9c21ffad5485fa82550c7627fb2eb121ebe3f165648a"
+	toKeyPair, _ := wallet.GetKeyPairFromPrivateKey(toPrivateKey)
+
+	contractAddress := "0x5B0CFA20e02145ea529983c7954702Ab5E9e7949"
+
+	amount := new(big.Int).SetUint64(uint64(50))
+
+	receipt, err := ApproveERc20UsingABIGen(client, *fromKeyPair, contractAddress, toKeyPair.PublicKey, amount)
+	assert.Equal(t, nil, err)
+	assert.Equal(t, uint64(1), receipt.Status)
+	t.Log(receipt.TxHash.Hex())
 }

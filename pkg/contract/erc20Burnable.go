@@ -76,6 +76,36 @@ func MintERC20Burnable(client *ethclient.Client, keyPair wallet.KeyPair, contrac
 	return receipt, nil
 }
 
+func ApproveERc20UsingABIGen(client *ethclient.Client, keyPair wallet.KeyPair, contractAddress_ string, spender common.Address, amount *big.Int) (*types.Receipt, error) {
+	auth, err := GetAuth(client, keyPair)
+	if err != nil {
+		return nil, err
+	}
+
+	contractAddress := common.HexToAddress(contractAddress_)
+	instance, err := smartcontract.NewERC20Burnable(contractAddress, client)
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := instance.Approve(auth, spender, amount)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ContractResponse{
+		Tx:       tx,
+		Instance: instance,
+	}
+
+	receipt, err := checkMinted(client, response)
+	if err != nil {
+		return nil, err
+	}
+
+	return receipt, nil
+}
+
 func TransferERC20UsingABIGen(client *ethclient.Client, keyPair wallet.KeyPair, contractAddress_ string, toAddress_ string, amount_ int) (*types.Receipt, error) {
 	auth, err := GetAuth(client, keyPair)
 	if err != nil {

@@ -20,7 +20,7 @@ func main() {
 
 	eventHandler := event.NewEventListenHandler(client)
 
-	_contractAddress := "0xC41d1D11c38baBb1385d9d908cea0C3944ba0B66"
+	_contractAddress := "0x5B0CFA20e02145ea529983c7954702Ab5E9e7949"
 	// for {
 	// 	eventHandler.Subscribe(_contractAddress)
 	// }
