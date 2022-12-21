@@ -1,0 +1,13 @@
+blockchain:
+  endPoint: "http://127.0.0.1:22001"
+  websocket: "ws://127.0.0.1:32001"
+  txTimeoutSec: 20
+  checkTxReceiptTimeMilliSec: 200
+  nonceErrRetryCnt: 3
+  debugMode: true
+  userLockEnable: true
+
+
+
+
+  
